@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30%           { transform: translateY(-6px); }
+}
+
+@theme {
+  --animate-fadeIn: fadeIn 0.3s ease;
+  --animate-typingBounce: typingBounce 1.2s ease infinite;
+}
+
+body {
+  font-family: 'Microsoft JhengHei', '微軟正黑體', Arial, sans-serif;
+  background-color: #f0f4f8;
+}
