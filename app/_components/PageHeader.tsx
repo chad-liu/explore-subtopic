@@ -7,6 +7,9 @@ export default function PageHeader({ onReset, hasResult }: Props) {
   return (
     <header
       style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 10,
         background: 'linear-gradient(135deg, #4a90d9 0%, #357abd 100%)',
         boxShadow: '0 2px 8px rgba(74,144,217,0.3)',
       }}
