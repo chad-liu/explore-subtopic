@@ -93,20 +93,79 @@ export function useEvaluate() {
     setError(null);
   }, []);
 
-  const saveSuggestion = useCallback(() => {
-    if (!suggestion) return;
-
+  const dateStr = () => {
     const now = new Date();
-    const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  };
 
-    let content = `議題探究建議報告\n日期：${dateStr}\n${'='.repeat(40)}\n\n`;
+  const saveTxt = useCallback(() => {
+    if (!suggestion) return;
+    const d = dateStr();
+    let content = `議題探究建議報告\n日期：${d}\n${'='.repeat(40)}\n\n`;
     content += `主題：${topic}\n\n子題：\n${subtopics}\n\n`;
     content += `${'='.repeat(40)}\n\nAI 評估建議：\n\n${suggestion}`;
-
     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `議題探究建議_${dateStr}.txt`;
+    a.download = `議題探究建議_${d}.txt`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }, [topic, subtopics, suggestion]);
+
+  const saveHtml = useCallback(() => {
+    if (!suggestion) return;
+    const d = dateStr();
+
+    const bodyHtml = suggestion
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+      .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+      .replace(/^- (.+)$/gm, '<li>$1</li>')
+      .replace(/\n\n/g, '</p><p>')
+      .replace(/\n/g, '<br>');
+
+    const subtopicLines = subtopics.split('\n').filter(l => l.trim());
+    const subtopicHtml = subtopicLines.map((l, i) => `<li>${i + 1}. ${l.trim()}</li>`).join('');
+
+    const html = `<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>議題探究建議 — ${topic}</title>
+<style>
+  body { font-family: 'Microsoft JhengHei', Arial, sans-serif; background: #f0f4f8; color: #333; margin: 0; padding: 24px 16px; }
+  .card { background: white; border-radius: 16px; max-width: 700px; margin: 0 auto; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+  h1 { font-size: 1.3rem; color: #4a90d9; margin: 0 0 4px; }
+  .meta { color: #888; font-size: 0.875rem; margin-bottom: 24px; }
+  .section-title { font-weight: 700; color: #555; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; margin: 20px 0 8px; }
+  .subtopics { list-style: none; padding: 12px 16px; margin: 0 0 24px; background: #f7f9fc; border-radius: 8px; }
+  .subtopics li { padding: 3px 0; }
+  hr { border: none; border-top: 1px solid #e0e8f0; margin: 24px 0; }
+  .suggestion { line-height: 1.85; }
+  .suggestion h2 { font-size: 1rem; color: #2a6bae; margin: 1.2rem 0 0.3rem; }
+  .suggestion h3 { font-size: 0.95rem; color: #357abd; margin: 1rem 0 0.2rem; }
+  .suggestion li { margin: 0.15rem 0 0.15rem 1.2rem; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>議題探究建議報告</h1>
+  <p class="meta">日期：${d}</p>
+  <div class="section-title">主題</div>
+  <p><strong>${topic}</strong></p>
+  <div class="section-title">子題</div>
+  <ul class="subtopics">${subtopicHtml}</ul>
+  <hr>
+  <div class="suggestion"><p>${bodyHtml}</p></div>
+</div>
+</body>
+</html>`;
+
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `議題探究建議_${d}.html`;
     a.click();
     URL.revokeObjectURL(a.href);
   }, [topic, subtopics, suggestion]);
@@ -115,6 +174,6 @@ export function useEvaluate() {
     topic, setTopic,
     subtopics, setSubtopics,
     suggestion, isStreaming, hasResult, error,
-    evaluate, reset, saveSuggestion,
+    evaluate, reset, saveTxt, saveHtml,
   };
 }

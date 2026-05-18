@@ -4,7 +4,8 @@ interface Props {
   suggestion: string;
   isStreaming: boolean;
   hasResult: boolean;
-  onSave: () => void;
+  onSaveTxt: () => void;
+  onSaveHtml: () => void;
 }
 
 function parseMarkdown(text: string): string {
@@ -25,7 +26,7 @@ function parseMarkdown(text: string): string {
     .replace(/\n/g, '<br>');
 }
 
-export default function SuggestionPanel({ suggestion, isStreaming, hasResult, onSave }: Props) {
+export default function SuggestionPanel({ suggestion, isStreaming, hasResult, onSaveTxt, onSaveHtml }: Props) {
   return (
     <div
       style={{
@@ -63,9 +64,9 @@ export default function SuggestionPanel({ suggestion, isStreaming, hasResult, on
       )}
 
       {hasResult && !isStreaming && (
-        <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end' }}>
+        <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
           <button
-            onClick={onSave}
+            onClick={onSaveTxt}
             style={{
               background: '#5cb85c',
               color: 'white',
@@ -78,7 +79,23 @@ export default function SuggestionPanel({ suggestion, isStreaming, hasResult, on
               cursor: 'pointer',
             }}
           >
-            💾 儲存建議
+            📄 文字檔
+          </button>
+          <button
+            onClick={onSaveHtml}
+            style={{
+              background: '#4a90d9',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '9px 22px',
+              fontSize: '0.9rem',
+              fontWeight: '600',
+              fontFamily: 'inherit',
+              cursor: 'pointer',
+            }}
+          >
+            🌐 網頁
           </button>
         </div>
       )}

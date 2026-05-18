@@ -10,7 +10,7 @@ export default function MainPage() {
     topic, setTopic,
     subtopics, setSubtopics,
     suggestion, isStreaming, hasResult, error,
-    evaluate, reset, saveSuggestion,
+    evaluate, reset, saveTxt, saveHtml,
   } = useEvaluate();
 
   return (
@@ -40,7 +40,8 @@ export default function MainPage() {
             suggestion={suggestion}
             isStreaming={isStreaming}
             hasResult={hasResult}
-            onSave={saveSuggestion}
+            onSaveTxt={saveTxt}
+            onSaveHtml={saveHtml}
           />
         )}
       </main>
