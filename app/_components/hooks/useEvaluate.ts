@@ -107,7 +107,7 @@ export function useEvaluate() {
     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `議題探究建議_${d}.txt`;
+    a.download = `議題探究建議_${d}[${topic}].txt`;
     a.click();
     URL.revokeObjectURL(a.href);
   }, [topic, subtopics, suggestion]);
@@ -207,7 +207,7 @@ export function useEvaluate() {
     const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `議題探究建議_${d}.html`;
+    a.download = `議題探究建議_${d}[${topic}].html`;
     a.click();
     URL.revokeObjectURL(a.href);
   }, [topic, subtopics, suggestion]);
