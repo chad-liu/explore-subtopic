@@ -116,14 +116,49 @@ export function useEvaluate() {
     if (!suggestion) return;
     const d = dateStr();
 
-    const bodyHtml = suggestion
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-      .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-      .replace(/^- (.+)$/gm, '<li>$1</li>')
-      .replace(/\n\n/g, '</p><p>')
-      .replace(/\n/g, '<br>');
+    const applyInline = (text: string) =>
+      text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
+    const convertTable = (tableLines: string[]): string => {
+      const isSeparator = (l: string) => /^\|[\s\-:|]+\|$/.test(l.trim());
+      const parseRow = (l: string) => l.split('|').slice(1, -1).map(c => c.trim());
+      const dataLines = tableLines.filter(l => !isSeparator(l));
+      if (dataLines.length === 0) return '';
+      const [head, ...body] = dataLines;
+      const thead = `<thead><tr>${parseRow(head).map(h => `<th>${applyInline(h)}</th>`).join('')}</tr></thead>`;
+      const tbody = body.map(l => `<tr>${parseRow(l).map(c => `<td>${applyInline(c)}</td>`).join('')}</tr>`).join('');
+      return `<table>${thead}<tbody>${tbody}</tbody></table>`;
+    };
+
+    const markdownToHtml = (md: string): string => {
+      const lines = md.split('\n');
+      const out: string[] = [];
+      let i = 0;
+      while (i < lines.length) {
+        const line = lines[i];
+        const trimmed = line.trim();
+        if (/^# (.+)$/.test(line))       { out.push(`<h1>${applyInline(line.slice(2))}</h1>`); i++; continue; }
+        if (/^## (.+)$/.test(line))      { out.push(`<h2>${applyInline(line.slice(3))}</h2>`); i++; continue; }
+        if (/^### (.+)$/.test(line))     { out.push(`<h3>${applyInline(line.slice(4))}</h3>`); i++; continue; }
+        if (/^---+$/.test(trimmed))      { out.push('<hr>'); i++; continue; }
+        if (trimmed.startsWith('|')) {
+          const rows: string[] = [];
+          while (i < lines.length && lines[i].trim().startsWith('|')) { rows.push(lines[i]); i++; }
+          out.push(convertTable(rows)); continue;
+        }
+        if (/^- (.+)$/.test(line)) {
+          const items: string[] = [];
+          while (i < lines.length && /^- (.+)$/.test(lines[i])) { items.push(`<li>${applyInline(lines[i].slice(2))}</li>`); i++; }
+          out.push(`<ul>${items.join('')}</ul>`); continue;
+        }
+        if (trimmed === '') { out.push('<br>'); i++; continue; }
+        out.push(`<p>${applyInline(line)}</p>`);
+        i++;
+      }
+      return out.join('\n');
+    };
+
+    const bodyHtml = markdownToHtml(suggestion);
     const subtopicLines = subtopics.split('\n').filter(l => l.trim());
     const subtopicHtml = subtopicLines.map((l, i) => `<li>${i + 1}. ${l.trim()}</li>`).join('');
 
@@ -143,9 +178,16 @@ export function useEvaluate() {
   .subtopics li { padding: 3px 0; }
   hr { border: none; border-top: 1px solid #e0e8f0; margin: 24px 0; }
   .suggestion { line-height: 1.85; }
+  .suggestion h1 { font-size: 1.2rem; color: #1a5fa8; margin: 1.4rem 0 0.4rem; }
   .suggestion h2 { font-size: 1rem; color: #2a6bae; margin: 1.2rem 0 0.3rem; }
   .suggestion h3 { font-size: 0.95rem; color: #357abd; margin: 1rem 0 0.2rem; }
-  .suggestion li { margin: 0.15rem 0 0.15rem 1.2rem; }
+  .suggestion ul { padding-left: 1.4rem; margin: 0.4rem 0; }
+  .suggestion li { margin: 0.2rem 0; }
+  .suggestion p { margin: 0.4rem 0; }
+  .suggestion table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.9rem; }
+  .suggestion th { background: #4a90d9; color: white; padding: 8px 12px; text-align: left; }
+  .suggestion td { padding: 7px 12px; border-bottom: 1px solid #e0e8f0; }
+  .suggestion tr:nth-child(even) td { background: #f7f9fc; }
 </style>
 </head>
 <body>
@@ -157,7 +199,7 @@ export function useEvaluate() {
   <div class="section-title">子題</div>
   <ul class="subtopics">${subtopicHtml}</ul>
   <hr>
-  <div class="suggestion"><p>${bodyHtml}</p></div>
+  <div class="suggestion">${bodyHtml}</div>
 </div>
 </body>
 </html>`;
