@@ -59,7 +59,7 @@ export default function InputPanel({
             type="text"
             value={topic}
             onChange={e => onTopicChange(e.target.value)}
-            placeholder="例：氣候變遷、台灣的飲食文化、網路霸凌..."
+            placeholder="例：國小教室適不適合裝監視器？/臺灣適合再生能源發電嗎？..."
             disabled={disabled}
             style={inputBase}
           />
@@ -78,7 +78,7 @@ export default function InputPanel({
           >
             子題{' '}
             <span style={{ fontWeight: '400', color: '#888', fontSize: '0.875rem' }}>
-              （每行填寫一個，建議 4～5 個）
+              （每行填寫一個，建議 4個，若評估後有必要，5個也可以）
             </span>
           </label>
           <textarea
