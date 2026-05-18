@@ -10,12 +10,12 @@ export default function MainPage() {
     topic, setTopic,
     subtopics, setSubtopics,
     suggestion, isStreaming, hasResult, error,
-    evaluate, reset, saveTxt, saveHtml, downloadLog,
+    evaluate, reset, saveTxt, saveHtml,
   } = useEvaluate();
 
   return (
     <div style={{ minHeight: '100vh', background: '#f0f4f8' }}>
-      <PageHeader onReset={reset} onDownloadLog={downloadLog} hasResult={hasResult} />
+      <PageHeader onReset={reset} hasResult={hasResult} />
       <main
         style={{
           maxWidth: '700px',

@@ -1,21 +1,9 @@
 interface Props {
   onReset: () => void;
-  onDownloadLog: () => void;
   hasResult: boolean;
 }
 
-export default function PageHeader({ onReset, onDownloadLog, hasResult }: Props) {
-  const btnStyle: React.CSSProperties = {
-    background: 'rgba(255,255,255,0.2)',
-    color: 'white',
-    border: '1px solid rgba(255,255,255,0.5)',
-    borderRadius: '8px',
-    padding: '7px 16px',
-    fontSize: '0.875rem',
-    cursor: 'pointer',
-    fontFamily: 'inherit',
-  };
-
+export default function PageHeader({ onReset, hasResult }: Props) {
   return (
     <header
       style={{
@@ -44,16 +32,23 @@ export default function PageHeader({ onReset, onDownloadLog, hasResult }: Props)
             主題與子題評估建議
           </p>
         </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button onClick={onDownloadLog} style={btnStyle}>
-            📋 使用記錄
+        {hasResult && (
+          <button
+            onClick={onReset}
+            style={{
+              background: 'rgba(255,255,255,0.2)',
+              color: 'white',
+              border: '1px solid rgba(255,255,255,0.5)',
+              borderRadius: '8px',
+              padding: '7px 16px',
+              fontSize: '0.875rem',
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+            }}
+          >
+            重新開始
           </button>
-          {hasResult && (
-            <button onClick={onReset} style={btnStyle}>
-              重新開始
-            </button>
-          )}
-        </div>
+        )}
       </div>
     </header>
   );
