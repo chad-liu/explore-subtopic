@@ -78,7 +78,7 @@ export default function InputPanel({
           >
             子題{' '}
             <span style={{ fontWeight: '400', color: '#888', fontSize: '0.875rem' }}>
-              （每行填寫一個，建議 4個，若評估後有必要，5個也可以）
+              （每行填寫一個，建議 4個，若認為有必要，5個也可以）
             </span>
           </label>
           <textarea
