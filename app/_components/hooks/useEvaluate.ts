@@ -68,6 +68,7 @@ export function useEvaluate() {
             }
             if (data.done) {
               setHasResult(true);
+              appendLog('取得建議', topic.trim());
             }
             if (data.error) {
               setError(data.error);
@@ -98,6 +99,26 @@ export function useEvaluate() {
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   };
 
+  const appendLog = (action: string, topicName: string) => {
+    const now = new Date();
+    const ts = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+    const entry = `${ts}\t${action}\t${topicName}\n`;
+    const existing = localStorage.getItem('explore-subtopic-log') ?? '';
+    localStorage.setItem('explore-subtopic-log', existing + entry);
+  };
+
+  const downloadLog = useCallback(() => {
+    const log = localStorage.getItem('explore-subtopic-log');
+    if (!log) { alert('尚無使用記錄'); return; }
+    const header = '日期時間\t動作\t主題\n';
+    const blob = new Blob([header + log], { type: 'text/plain;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `使用記錄_${dateStr()}.txt`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }, []);
+
   const saveTxt = useCallback(() => {
     if (!suggestion) return;
     const d = dateStr();
@@ -110,6 +131,7 @@ export function useEvaluate() {
     a.download = `議題探究建議_${topic}_${d}.txt`;
     a.click();
     URL.revokeObjectURL(a.href);
+    appendLog('存檔 TXT', topic);
   }, [topic, subtopics, suggestion]);
 
   const saveHtml = useCallback(() => {
@@ -210,12 +232,13 @@ export function useEvaluate() {
     a.download = `議題探究建議_${topic}_${d}.html`;
     a.click();
     URL.revokeObjectURL(a.href);
+    appendLog('存檔 HTML', topic);
   }, [topic, subtopics, suggestion]);
 
   return {
     topic, setTopic,
     subtopics, setSubtopics,
     suggestion, isStreaming, hasResult, error,
-    evaluate, reset, saveTxt, saveHtml,
+    evaluate, reset, saveTxt, saveHtml, downloadLog,
   };
 }
